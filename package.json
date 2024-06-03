@@ -10,6 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@codemirror/collab": "^6.1.1",
+    "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/state": "^6.4.1",
+    "@codemirror/view": "^6.26.3",
+    "codemirror": "^6.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
