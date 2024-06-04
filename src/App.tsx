@@ -1,6 +1,7 @@
 import { Routes, Route, Link } from "react-router-dom";
 
-import { Editor, MultiInstanceEditor } from "./components";
+import { MultiInstanceEditor } from "./components";
+import { SingleInstanceEditor } from "./pages/single";
 
 const Fallback = () => {
   return (
@@ -27,21 +28,10 @@ const Fallback = () => {
 };
 
 const App = () => {
-  const singleInstanceEditor = location.href.includes("single");
-  const multiInstanceEditor = location.href.includes("multi");
-
-  if (singleInstanceEditor) {
-    return <Editor />;
-  }
-
-  if (multiInstanceEditor) {
-    return <MultiInstanceEditor />;
-  }
-
   return (
     <>
       <Routes>
-        <Route path="/single" element={<Editor />} />
+        <Route path="/single" element={<SingleInstanceEditor />} />
         <Route path="/multi" element={<MultiInstanceEditor />} />
         <Route path="/" element={<Fallback />} />
       </Routes>
