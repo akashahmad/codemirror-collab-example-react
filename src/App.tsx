@@ -1,4 +1,30 @@
+import { Routes, Route, Link } from "react-router-dom";
+
 import { Editor, MultiInstanceEditor } from "./components";
+
+const Fallback = () => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignContent: "center",
+        height: "90vh",
+        width: "100%",
+        textAlign: "center",
+      }}
+    >
+      <div>
+        <h1>Codemirror MultiTab Editors</h1>
+      </div>
+      <div>
+        <Link to="/multi">Multi Instance Editor</Link>&nbsp;&nbsp;
+        <Link to="/single">Single Instance Editor</Link>
+      </div>
+    </div>
+  );
+};
 
 const App = () => {
   const singleInstanceEditor = location.href.includes("single");
@@ -13,32 +39,13 @@ const App = () => {
   }
 
   return (
-    <div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignContent: "center",
-          height: "90vh",
-          width: "100%",
-          textAlign: "center",
-        }}
-      >
-        <div>
-          <h1>Codemirror MultiTab Editors</h1>
-        </div>
-        <div>
-          <button onClick={() => (location.href = "/multi")}>
-            Multi Instance Editor
-          </button>
-          &nbsp;&nbsp;
-          <button onClick={() => (location.href = "/single")}>
-            Single Instance Editor
-          </button>
-        </div>
-      </div>
-    </div>
+    <>
+      <Routes>
+        <Route path="/single" element={<Editor />} />
+        <Route path="/multi" element={<MultiInstanceEditor />} />
+        <Route path="/" element={<Fallback />} />
+      </Routes>
+    </>
   );
 };
 

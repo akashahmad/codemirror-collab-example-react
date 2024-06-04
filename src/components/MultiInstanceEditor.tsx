@@ -52,6 +52,7 @@ export const MultiInstanceEditor = () => {
       <div style={{ display: "flex" }}>
         {Object.keys(files).map((filename) => (
           <button
+            key={filename}
             style={{
               marginRight: "4px",
               display: "flex",
