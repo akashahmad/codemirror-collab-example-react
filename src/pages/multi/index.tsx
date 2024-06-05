@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Editor } from "../../components";
+import { MultiInstanceEditor as Editor } from "../../components";
 import { getPeerExtension } from "../../utils/peerExtension";
 import { useConnection } from "../../hooks/useConnection";
 
@@ -10,7 +10,7 @@ const worker = new Worker(new URL(WORKER_PATH, import.meta.url), {
   type: "module",
 });
 
-export const SingleInstanceEditor = () => {
+export const MultiInstanceEditor = () => {
   const [files, setFiles] = useState<Record<string, string | undefined>>({
     "main.js": undefined,
     "app.js": undefined,
@@ -20,14 +20,9 @@ export const SingleInstanceEditor = () => {
   const [activeFileName, setActiveFileName] =
     useState<keyof typeof files>("main.js");
 
-  const handleTabClick = useCallback(
-    (filename: keyof typeof files, editorStateInJSON: string) => {
-      setFiles({ ...files, [activeFileName]: editorStateInJSON });
-
-      setActiveFileName(filename);
-    },
-    [activeFileName, files]
-  );
+  const handleTabClick = useCallback((filename: keyof typeof files) => {
+    setActiveFileName(filename);
+  }, []);
 
   const handleCloseFile = useCallback(
     (filename: keyof typeof files) => {
@@ -54,23 +49,28 @@ export const SingleInstanceEditor = () => {
   return (
     <div>
       <h2 style={{ lineHeight: 0 }}>Peer A</h2>
-      <Editor
-        files={files}
-        initialDocument={Text.of(["initial content"])}
-        peerExtension={peerExtensionA}
-        currentFilename={activeFileName}
-        handleCloseFile={handleCloseFile}
-        handleTabClick={handleTabClick}
-      />
-      <h2 style={{ lineHeight: 0 }}>Peer B</h2>
-      <Editor
-        files={files}
-        initialDocument={Text.of(["initial content"])}
-        peerExtension={peerExtensionB}
-        currentFilename={activeFileName}
-        handleCloseFile={handleCloseFile}
-        handleTabClick={handleTabClick}
-      />
+      <div style={{ height: "45vh" }}>
+        <Editor
+          files={files}
+          initialDocument={Text.of(["initial content"])}
+          peerExtension={peerExtensionA}
+          currentFilename={activeFileName}
+          handleCloseFile={handleCloseFile}
+          handleTabClick={handleTabClick}
+        />
+      </div>
+
+      <div>
+        <h2 style={{ lineHeight: 0, zIndex: 100 }}>Peer B</h2>
+        <Editor
+          files={files}
+          initialDocument={Text.of(["initial content"])}
+          peerExtension={peerExtensionB}
+          currentFilename={activeFileName}
+          handleCloseFile={handleCloseFile}
+          handleTabClick={handleTabClick}
+        />
+      </div>
     </div>
   );
 };

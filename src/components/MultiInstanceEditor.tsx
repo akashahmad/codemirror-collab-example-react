@@ -1,111 +1,117 @@
-import { useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useState, type FC } from "react";
 import { basicSetup } from "codemirror";
 import { EditorView } from "@codemirror/view";
-import { EditorState } from "@codemirror/state";
+import { EditorState, type Extension, type Text } from "@codemirror/state";
 import { javascript } from "@codemirror/lang-javascript";
 
-export const MultiInstanceEditor = () => {
-  const [currentFilename, setCurrentFilename] = useState("main.js");
-  const [initialized, setInitialized] = useState<string[]>([]);
-  const [files, setFiles] = useState<Record<string, string | undefined>>({
-    "main.js": undefined,
-    "app.js": undefined,
-    "server.js": undefined,
-    "api.js": undefined,
-  });
+interface MultiInstanceProps {
+  initialDocument: string | Text | undefined;
+  peerExtension: (fileName: string) => Extension;
+  currentFilename: string;
+  files: Record<string, string | undefined>;
+  handleTabClick: (filename: string) => void;
+  handleCloseFile: (filename: string) => void;
+  savedState?: string;
+}
 
-  useLayoutEffect(() => {
-    if (initialized.includes(currentFilename)) return;
+export const MultiInstanceEditor: FC<MultiInstanceProps> = React.memo(
+  ({
+    initialDocument,
+    peerExtension,
+    currentFilename,
+    files,
+    handleCloseFile,
+    handleTabClick,
+  }) => {
+    const [initialized, setInitialized] = useState<string[]>([]);
 
-    const editorParent = document.getElementById(currentFilename);
-    if (editorParent) {
-      const state = EditorState.create({
-        doc: "",
-        extensions: [basicSetup, javascript()],
-      });
+    useLayoutEffect(() => {
+      if (initialized.includes(currentFilename)) return;
 
-      new EditorView({
-        state,
-        parent: editorParent,
-      });
-    }
+      const editorParent = document.getElementById(currentFilename);
+      if (editorParent) {
+        const state = EditorState.create({
+          doc: initialDocument,
+          extensions: [
+            basicSetup,
+            javascript(),
+            peerExtension(currentFilename),
+          ],
+        });
 
-    setInitialized([...initialized, currentFilename]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentFilename]);
+        new EditorView({
+          state,
+          parent: editorParent,
+        });
+      }
 
-  const handleTabClick = (filename: keyof typeof files) => {
-    setCurrentFilename(filename);
-  };
+      setInitialized([...initialized, currentFilename]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentFilename]);
 
-  const handleCloseFile = (filename: keyof typeof files) => {
-    delete files[filename];
-
-    if (currentFilename === filename) {
-      setCurrentFilename(Object.keys(files)[0]);
-    }
-    setFiles({ ...files });
-  };
-
-  return (
-    <div>
-      <div style={{ display: "flex" }}>
-        {Object.keys(files).map((filename) => (
-          <button
-            key={filename}
-            style={{
-              marginRight: "4px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              border:
-                currentFilename === filename
-                  ? "2px solid red"
-                  : "1px solid #ccc",
-            }}
-            onClick={() => handleTabClick(filename)}
-          >
-            <span>{filename}</span>
-            <span
-              onClick={() => handleCloseFile(filename)}
+    return (
+      <div>
+        <div style={{ display: "flex" }}>
+          {Object.keys(files).map((filename) => (
+            <button
+              key={filename}
               style={{
-                marginLeft: "10px",
-                color: "red",
-                padding: 4,
-                fontSize: 18,
-                cursor: "pointer",
+                marginRight: "4px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                zIndex: 100,
+                border:
+                  currentFilename === filename
+                    ? "2px solid red"
+                    : "1px solid #ccc",
               }}
+              onClick={() => handleTabClick(filename)}
             >
-              x
-            </span>
-          </button>
-        ))}
-      </div>
-      <div
-        key={JSON.stringify(files)}
-        style={{ padding: "10px 0px", display: "flex" }}
-      >
-        {Object.keys(files).map((filename) => (
-          <div
-            key={filename}
-            style={{
-              width: "100%",
-              display: currentFilename === filename ? "flex" : "none",
-              flexDirection: "column",
-            }}
-          >
+              <span>{filename}</span>
+              <span
+                onClick={() => handleCloseFile(filename)}
+                style={{
+                  marginLeft: "10px",
+                  color: "red",
+                  padding: 4,
+                  fontSize: 18,
+                  cursor: "pointer",
+                }}
+              >
+                x
+              </span>
+            </button>
+          ))}
+        </div>
+        <div
+          key={JSON.stringify(files)}
+          style={{ padding: "10px 0px", display: "flex" }}
+        >
+          {Object.keys(files).map((filename) => (
             <div
               key={filename}
-              id={filename}
               style={{
-                height: "90vh",
-                width: "99vw",
-                border: "1px solid #ccc",
+                // width: "99vw",
+                position: "relative",
+                display: currentFilename === filename ? "flex" : "none",
+                flexDirection: "column",
               }}
-            ></div>
-          </div>
-        ))}
+            >
+              <div
+                key={filename}
+                id={filename}
+                style={{
+                  height: "35vh",
+                  width: "90vw",
+                  left: 0,
+                  border: "1px solid #ccc",
+                }}
+              ></div>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+);

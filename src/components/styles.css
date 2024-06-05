@@ -1,5 +1,6 @@
 .cm-editor {
-  height: 100%;
+  height: 50vh;
+  z-index: 10;
 }
 .cm-scroller {
   overflow: auto;

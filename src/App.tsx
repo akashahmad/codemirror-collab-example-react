@@ -1,6 +1,6 @@
 import { Routes, Route, Link } from "react-router-dom";
 
-import { MultiInstanceEditor } from "./components";
+import { MultiInstanceEditor } from "./pages/multi";
 import { SingleInstanceEditor } from "./pages/single";
 
 const Fallback = () => {
